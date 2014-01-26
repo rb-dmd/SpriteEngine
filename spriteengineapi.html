@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta name="module"  content="INM335 Multimedia Design and Development"/>
+	<meta name="session" content="plan [session]"/>
+	<meta name="author"  content="Richard Butterworth"/>
+<title>SpriteEngine.js API (v0.2)</title>
+<style>
+	body{ font-family: Arial, Helvetica, sans-serif; font-size: 11pt; }
+    span.em{ font-weight: bold }
+    div.figure{ border: 1px black solid; text-align: center; background-color: #d0d0f0; }
+	div.dbtable{ text-align: left; background-color: #d0d0f0; padding: 10px }
+	p.dbtablename{ font-weight: bold; padding: 0; margin: 0; margin-bottom: 2px }
+	tr.dbtablehead{ font-weight: bold; background-color: #e0e0e0; }
+	tr.dbtabledata{ background-color: white; }
+    img.figure-img, a.figure-img{ padding: 4px }
+    div.figure-subimg{ display: inline-block }
+    div.figure-caption{ clear: both; font-size: smaller; padding-bottom: 4px }
+    span.figure-caption-label, div.figure-subfig-label{ font-weight: bold }
+    div.figure-subfig-label{ text-align: center; font-size: smaller; padding-bottom: 4px }
+	span.code, p.example{ font-family: Courier }
+	p.quote, p.example{ padding: 20px; margin-left: 20px; margin-right: 20px; background-color: #d0d0f0; margin-bottom: 0; margin-top: 0; }
+	p.quotesource{ font-style: italic; margin-top: 0; padding-top: 0; padding-left: 20px; padding-right: 20px; margin-left: 20px; margin-right: 20px; text-align: right; }
+	p.example{ font-size: smaller; }
+	p.comment{ font-weight: bold; }
+	p.title{ font-size: 16pt; text-align: center; font-weight: bold; font-style: italic; }
+</style>
+</head>
+<body>
+<p class="title">SpriteEngine.js API</p>
+<p>An API (Application Programming Interface) describes <span class="em">what</span> a software library does (without getting bogged down in the details of <span class="em">how</span> it works).</p>
+<p>This API describes SpriteEngine.js; it lists the objects in SpriteEngine.js and for each object it describes its properties and methods.</p>
+<p>SpriteEngine.js is for educational purposes only; it is developed as a teaching aid on this course. It is probably not robust enough to underpin a commercial application. In particular SpriteEngine.js is not error tolerant; if it is not used in the ways described below it is unlikely to fail gracefully. SpriteEngine.js is specifically targeted at Firefox v10. It is probably best, as far as possible, not to mix SpriteEngine with raw canvas code, as this might cause problems. In particular SpriteEngine assumes that the canvas has no transformations, clipping or compositing applied to it.</p>
+<p>This document describes SpriteEngine.js v0.2, the most upto date version as of 22th February 2012.</p>
+<p>SpriteEngine.js defines the following objects...</p>
+<ol>
+<li>SpriteEngine</li>
+<li>Sprite</li>
+<li>SpriteEvent</li>
+<li>SpriteEngineEvent</li>
+<li>SpriteTween</li>
+</ol>
+<h1>1. SpriteEngine</h1>
+<p>SpriteEngine holds the display list of sprites, displays them, captures mouse and keyboard events and passes them to the sprites. It also contains a system for preloading external media files, and allowing sprites to be dragged by the mouse cursor.</p>
+<h2>1.1. Constructor</h2>
+<div class="code"><pre style="font-weight: bold">var spriteengine = new SpriteEngine( <span style="color: red">canvasid</span> );</pre></div>
+<p>The above code creates a new SpriteEngine and targets it at the canvas element with the id given by <span class="code">canvasid</span>. <span class="code">canvasid</span> must be a string.</p>
+<h2>1.2. Properties</h2>
+<div class="code"><pre style="font-weight: bold">spriteenegine.canvaselement</pre></div>
+<p>A reference to the canvas element targeted by <span class="code">spriteengine</span>. (Read only.)</p>
+<div class="code"><pre style="font-weight: bold">spriteenegine.context</pre></div>
+<p>A reference to the 2D drawing context of the targeted canvas element. (Read only.)</p>
+<h2>1.3. Methods</h2>
+<div class="code"><pre style="font-weight: bold">spriteenegine.addEventListener( <span style="color: red">event</span>, <span style="color: red">response</span> );</pre></div>
+<p>Adds an event listener to <span class="code">spriteengine</span>. <span class="code">event</span> must be a string and can have the values "mousein", "mouseout", "mouseup", "mousedown", "click", "keyup", "keydown" and "redraw". The mouse events relate to mouse events on the canvas element targeted by <span class="code">spriteengine</span>. The keyboard events relate to keyboard events on the whole broswer window. The "redraw" event is called whenever <span class="code">spriteengine</span>'s display list is drawn. Whenever an event is detected the corresponding response function is called. The response function will have a <span class="code">SpriteEngineEvent</span> (see below) object as a parameter. <span class="code">response</span> must therefore be a function with one parameter of type <span class="code">SpriteEngineEvent</span>.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.addSprite( <span style="color: red">sprite</span>, <span style="color: red">count</span> )</pre></div>
+<p>Adds the sprite <span class="code">sprite</span> (which must be a <span class="code">Sprite</span> object -- see below ) to the display list at position given by <span class="code">count</span> (which must be a number). If <span class="code">count</span> is ommited then <span class="code">sprite</span> is added to the end of the display list. (Items at the end of the display list are displayed overlaying all other items in the list.)</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.getSpriteCount( )</pre></div>
+<p>Returns the number of sprites in the display list.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.getSpriteAt( <span style="color: red">index</span> )</pre></div>
+<p>Returns the sprite in the display list with index given by <span class="code">index</span>. The indexes are zero based, therefore <span class="code">index</span> must be a number greater or equal to 0 and less than <span class="code">spriteengine.getSpriteCount( )</span>.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.bringSpriteToTop( <span style="color: red">sprite</span> )</pre></div>
+<p>Puts <span class="code">sprite</span> at the end of the display list. <span class="code">sprite</span> must be in the display list.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.drawSprites( )</pre></div>
+<p>Draws the current display list on the targeted canvas.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.clearScreen( <span style="color: red">colour</span> )</pre></div>
+<p>Draws a rectangular box with a colour given by <span class="code">colour</span> over the whole of the targeted canvas. <span class="code">colour</span> must be a string containing a valid CSS colour definition.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.startDrag( <span style="color: red">sprite</span> )</pre></div>
+<p>Links the x and y co-ordinates of <span class="code">sprite</span> to the mouse cursor co-ordinates. <span class="code">sprite</span> must be in the display list. If the mouse cursor is outside the bounds of the targeted canvas then the dragged sprite's <span class="code">visible</span> property is set to false. If <span class="code">sprite</span> has any running tweens then they are stopped. Only one sprite can be dragged at a time. If <span class="code">startDrag</span> is called when another sprite is being dragged, the old sprite wills top being dragged and the drag will start on the new one.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.stopDrag( )</pre></div>
+<p>Any current sprite drags are stopped.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.addItemToLoad( <span style="color: red">source</span>, <span style="color: red">ref</span> );</pre></div>
+<p>Adds items to the preloading queue. <span class="code">source</span> is a string containing the source url of the external media file to be loaded. The media file will be loaded into the variable given by <span class="code">ref</span> when the preloader queue is loaded. If the file type is .jpg, .gif or .png then <span class="code">ref</span> must be an <span class="code">Image</span> object. For audio files the file type must be .ogg, but the preloader will try to load an .mp3 file or a .wav file if the browser reports that it cannor play .ogg files. For audio files <span class="code">ref</span> must be an <span class="code">Audio</span> object.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.startLoad( <span style="color: red">loadfunction</span> )</pre></div>
+<p>Starts the process of loading items in the preloader queue. Every time an item is loaded (or fails to load) the function <span class="code">loadfunction( sofar, outof, ref, error )</span> is called. <span class="code">sofar</span> is the number of files loaded so far, <span class="code">outof</span> is the total number of files to load, <span class="code">ref</span> is a reference to the item loaded, and <span class="code">error</span> is true if the file failed to load sucessfully, false otherwise.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.isKeyPressed( <span style="color: red">code</span> )</pre></div>
+<p>Returns true if the key with the code given by <span class="code">code</span> is currently pressed.</p>
+<div class="code"><pre style="font-weight: bold">spriteengine.pressKey( <span style="color: red">code</span> )
+spriteengine.unpressKey( <span style="color: red">code</span> )</pre></div>
+<p>Force a key with key code <span class="code">code</span> to either be pressed or unpressed. (These two methods are useful for creating virtual buttons.)</p>
+<h1>2. Sprite object</h1>
+<p>Sprites are objects drawn on the canvas. They can be of three types; a shape, which is a closed fill (possibly with a stroke) defined by a set of corner points; a bitmap, which can be series of images on a single sprite sheet; or a button which is some text on a rectagular background which animates a press action when pressed.</p>
+<h2>2.1. Constructors</h2>
+<p>There are three <span class="code">Sprite</span> constructors...</p>
+<div class="code"><pre style="font-weight: bold">var shape = new Sprite( "shape", <span style="color: red">points</span>, <span style="color: red">colour</span>, <span style="color: red">linewidth</span>, <span style="color: red">linecolour</span> );</pre></div>
+<p><span class="code">points</span> is a two dimensional array of numbers, where each sub array has two numbers, the first being an x co-ordinate and the second is the y co-ordinate. These points are displayed relative to the sprite's x and y co-ordinates. So the following array...</p>
+<div class="code"><pre style="font-weight: bold">[ [ 5, 5 ], [ -5, 5 ], [ -5, -5 ], [ 5, -5 ] ]</pre></div>
+<p>...will create a 10 pixel wide square with the sprite's x and y co-ordinates at the centre. If the sprite's x and y co-ordinates are (100, 50) then the square will be drawn with corners at (105, 55), (95, 55), (95, 45) and (105, 45). <span class="code">points</span> must contain at least three points.</p>
+<p><span class="code">colour</span> gives the colour that the shape is filled with and must be a string with a valid CSS colour. If not given it defaults to black. <span class="code">linewidth</span> gives the width of the stroke, and must be a positive number. If it is 0 then no stroke is drawn. If not given it defaults to 0. <span class="code">colour</span> gives the colour of the stroke and must be a string with a valid CSS colour. If not given it defaults to white.</p>
+<div class="code"><pre style="font-weight: bold">var bitmap = new Sprite( "bitmap", <span style="color: red">bitmapdata</span>, <span style="color: red">width</span>, <span style="color: red">height</span> );</pre></div>
+<p><span class="code">bitmapdata</span> must be an <span class="code">Image</span> object with completely loaded data. <span class="code">width</span> and <span class="code">height</span> give the width and height of the portion of <span class="code">bitmapdata</span> to be displayed. They must be positive numbers and by less than the image in <span class="code">bitmapdata</span>. If <span class="code">bitmapdata</span> is a sprite sheet then <span class="code">width</span> and <span class="code">height</span> give the size of the frame around the tiled image.</p>
+<p>The bitmap is displayed centred around the sprite's (x, y) co-ordinates.</p>
+<div class="code"><pre style="font-weight: bold">var button = new Sprite( "button", <span style="color: red">text</span>, <span style="color: red">width</span>, <span style="color: red">height</span>, <span style="color: red">font</span> );</pre></div>
+<p><span class="code">text</span> is a string containing the text to be placed on the button. <span class="code">width</span> and <span class="code">height</span> give the size of the button and must be positive numbers. <span class="code">font</span> gives the styling of the text and must be a string containing a CSS valid font description. If omitted it defaults to "18px Arial".</p>
+<p>The buttom is displayed centred around the sprite's (x, y) co-ordinates.</p>
+<h2>2.2. Properties common to all Sprites</h2>
+<div class="code"><pre style="font-weight: bold">sprite.x
+sprite.y</pre></div>
+<p>The x and y co-ordinates of the sprite. Default to (0, 0).</p>
+<div class="code"><pre style="font-weight: bold">sprite.width
+sprite.height</pre></div>
+<p>The width and height of the sprite. (Read only.)</p>
+<div class="code"><pre style="font-weight: bold">sprite.tween</pre></div>
+<p>A tween of type <span class="code">SpriteTween</span> attached to a sprite. If <span class="code">null</span>, then no tween is attached. Defaults to <span class="code">null</span>.</p>
+<div class="code"><pre style="font-weight: bold">sprite.scalex
+sprite.scaley</pre></div>
+<p>The scaling factors along the x and y axes. Must be numbers. 1 is full size, 0.5 is half size, 3 is triple size, etc. Default to 1.</p>
+<div class="code"><pre style="font-weight: bold">sprite.visible</pre></div>
+<p>true or false. If false then the sprite is not drawn by a SpriteEngine object, and does not respond to any events.</p>
+<div class="code"><pre style="font-weight: bold">sprite.maxx
+sprite.minx
+sprite.maxy
+sprite.miny</pre></div>
+<p>Define the bounding box around a sprite; ie the smallest or largest x and y co-ordinates that the sprite covers if the sprite is at (0, 0). (Read only.)</p>
+<h2>2.3. Properties specific to shapes and buttons</h2>
+<div class="code"><pre style="font-weight: bold">sprite.colour
+sprite.linecolour
+sprite.linewidth</pre></div>
+<p>The colours of the fill, the stroke and the width of the stroke respectively. The colours must be CSS valid colour strings, <span class="code">linewidth</span> must be a positive number. In the case of the button <span class="code">linecolour</span> also defines the colour of the text on the button.</p>
+<h2>2.4. Properties specific to buttons</h2>
+<div class="code"><pre style="font-weight: bold">sprite.font</pre></div>
+<p>The font of the text on the button. Must be a CSS valid font string.</p>
+<div class="code"><pre style="font-weight: bold">sprite.pressoffset</pre></div>
+<p>The number of pixels that the button moves when clicked. Must be a positive number. Defaults to 3.</p>
+<h2>2.5. Property specific to bitmaps</h2>
+<div class="code"><pre style="font-weight: bold">bitmap.frame</pre></div>
+<p>If the bitmap is a sprite sheet then <span class="code">frame</span> is the number of the tile on the sheet to be displayed. It is assumed that the tiles on the sheet run left to right and top to bottom, and all the tiles on the sheet are the same size (given by <span class="code">sprite.width</span> and <span class="code">sprite.height</span>). Frames are numbered from 0, and should therefore be a positive number between 0 and one less than the number of tiles on the sheet.</p>
+<h2>2.6. Methods</h2>
+<div class="code"><pre style="font-weight: bold">sprite.addEventListener( <span style="color: red">event</span>, <span style="color: red">response</span> )</pre></div>
+<p>Adds an event listener to <span class="code">sprite</span>. <span class="code">event</span> must be a string and can have the values "mousein", "mouseout", "mouseup", "mousedown", "click" and "redraw". The mouse events relate to mouse events on <span class="code">sprite</span>. The "redraw" event is called whenever <span class="code">sprite</span> is drawn by a <span class="code">SpriteEngine</span>. Whenever an event is detected the corresponding response function is called. The response function will have a <span class="code">SpriteEvent</span> (see below) object as a parameter. <span class="code">response</span> must therefore be a function with one parameter of type <span class="code">SpriteEvent</span>.</p>
+<div class="code"><pre style="font-weight: bold">sprite.pointHitTest( <span style="color: red">x</span>, <span style="color: red">y</span> )</pre></div>
+<p>Returns true or false depending on whether the given (x, y) co-ordinate is inside the sprite. In the case of bitmaps and buttons, it is the bounding box of the sprite that is tested.</p>
+<div class="code"><pre style="font-weight: bold">sprite.startTween( )
+sprite.stopTween( )</pre></div>
+<p>If a sprite has a tween attached to it then these commands start or stop the tween. Stopping the tween does not cause the tween's <span class="code">endfunction</span> (see below) to be called.</p>
+<div class="code"><pre style="font-weight: bold">sprite.collisionDetect( <span style="color: red">sprite2</span> )</pre></div>
+<p>Returns true or false depending on whether the bounding boxes of <span class="code">sprite</span> and <span class="code">sprite2</span> overlap.</p>
+<h1>3. SpriteEvent and SpriteEngineEvent</h1>
+<p><span class="code">SpriteEvent</span> and <span class="code">SpriteEngineEvent</span>s are created by a <span class="code">SpriteEngine</span> and you should not really need to create them, only read their properties.</p>
+<h2>3.1. Properties common to SpriteEvent and SpriteEngineEvent</h2>
+<div class="code"><pre style="font-weight: bold">e.src</pre></div>
+<p>The object to which the event happened. (Read only.)</p>
+<div class="code"><pre style="font-weight: bold">e.timestamp</pre></div>
+<p>A <span class="code">Date</span> object containing the time at which the event occurred. (Read only.)</p>
+<div class="code"><pre style="font-weight: bold">e.event</pre></div>
+<p>A string containing the event that occurred. (Read only.)</p>
+<h2>3.2. Property specific to SpriteEngineEvent</h2>
+<div class="code"><pre style="font-weight: bold">e.keycode</pre></div>
+<p>If <span class="code">e.event</span> is "keyup" or "keydown" then the key code of the key pressed or released. (Read only.)</p>
+<h2>3.3. Properties specific to SpriteEngine</h2>
+<div class="code"><pre style="font-weight: bold">e.x
+e.y</pre></div>
+<p>The (x, y) co-ordinates of the mouse cursor when the event occurred. (Read only.)</p>
+<h1>4. SpriteTween</h1>
+<p>A SpriteTween creates a position tween (over the (x, y) co-ordinates) for a sprite. The tween defines a start and end point, and the time it should take to complete. As a programmer you only need to create a SpriteTween with its constructor, attach it to a sprite, then start it with the sprite's <span class="code">startTween</span> method. You should not need to deal with the tween's properties and methods directly.</p>
+<div class="code"><pre style="font-weight: bold">var tween = new SpriteTween( <span style="color: red">startx</span>, <span style="color: red">starty</span>, <span style="color: red">endx</span>, <span style="color: red">endy</span>,
+                    <span style="color: red">easeinout</span>, <span style="color: red">duration</span>, <span style="color: red">endfunction</span> );</pre></div>
+<p><span class="code">startx</span>, <span class="code">starty</span>, <span class="code">endx</span> and <span class="code">endy</span> give the start and end positions for the tween. If  <span class="code">startx</span> or <span class="code">starty</span> are null then the (x, y) co-ordinates of the sprite are used when <span class="code">startSprite</span> is called.</p>
+<p><span class="code">easeinout</span> is true or false. If true then an easing function is applied to both the beginning and end of the tween. If false then the tween is purely linear.</p>
+<p><span class="code">duration</span> is the time it takes the tween to complete. It is a number in milliseconds.</p>
+<p><span class="code">endfunction</span> is a function called when the tween completes. It takes one parameter, which is the sprite that the tween was attached to.</p>
+
+
+<p class="footer"><b>&copy; 2011 City University, Richard Butterworth</b></p>
+</body>
+</html>
